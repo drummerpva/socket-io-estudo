@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import { VERIFY_USER } from "../Events";
+import React, { useState } from 'react';
+import { VERIFY_USER } from '../Events';
 
 export default function LoginForm(props) {
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState('');
   const [error, setError] = useState();
   const { socket } = props;
 
   const setUser = ({ user, isUser }) => {
     if (isUser) {
-      setError("User name taken");
+      setError('User name taken');
     } else {
+      setError('');
       props.setUser(user);
-      setError("");
     }
   };
   const handleSubmit = e => {
@@ -30,7 +30,6 @@ export default function LoginForm(props) {
           <h2>Got a nickname?</h2>
         </label>
         <input
-          // ref={input => console.log(input)}
           type="text"
           id="nickname"
           value={nickname}

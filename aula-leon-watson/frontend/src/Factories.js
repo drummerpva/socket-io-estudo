@@ -1,29 +1,43 @@
-const uuid = require("uuid/v4");
+const uuid = require('uuid/v4');
 
-const createUser = ({ name = "" } = {}) => ({
+const createUser = ({ name = '', socketId = null } = {}) => ({
   id: uuid(),
-  name
+  name,
+  socketId,
 });
 
-const createMessage = ({ message = "", sender = "" } = {}) => ({
+const createMessage = ({ message = '', sender = '' } = {}) => ({
   id: uuid(),
   time: getTime(new Date(Date.now())),
   message,
-  sender
+  sender,
 });
 
 const createChat = ({
   messages = [],
-  name = "Community",
-  users = []
+  name = 'Community',
+  users = [],
+  isCommunity = false,
 } = {}) => ({
   id: uuid(),
-  name,
+  name: isCommunity ? 'Community' : createChatNameFromUsers(users),
   messages,
   users,
-  typingUsers: []
+  typingUsers: [],
+  isCommunity,
 });
 
+const createChatNameFromUsers = (users, excludedUser = '') => {
+  return users.filter(u => u !== excludedUser).join(' & ') || 'Empty Users';
+};
+
 const getTime = date => {
-  return `${date.getHours()}:${("0" + date.getMinutes()).slice(-2)}`;
+  return `${date.getHours()}:${('0' + date.getMinutes()).slice(-2)}`;
+};
+
+module.exports = {
+  createMessage,
+  createUser,
+  createChat,
+  createChatNameFromUsers,
 };

@@ -1,8 +1,9 @@
 const uuid = require("uuid/v4");
 
-const createUser = ({ name = "" } = {}) => ({
+const createUser = ({ name = "", socketId = null } = {}) => ({
   id: uuid(),
-  name
+  name,
+  socketId
 });
 
 const createMessage = ({ message = "", sender = "" } = {}) => ({
@@ -15,14 +16,20 @@ const createMessage = ({ message = "", sender = "" } = {}) => ({
 const createChat = ({
   messages = [],
   name = "Community",
-  users = []
+  users = [],
+  isCommunity = false
 } = {}) => ({
   id: uuid(),
-  name,
+  name: isCommunity ? "Community" : createChatNameFromUsers(users),
   messages,
   users,
-  typingUsers: []
+  typingUsers: [],
+  isCommunity
 });
+
+const createChatNameFromUsers = (users, excludedUser = "") => {
+  return users.filter(u => u !== excludedUser).join(" & ") || "Empty Users";
+};
 
 const getTime = date => {
   return `${date.getHours()}:${("0" + date.getMinutes()).slice(-2)}`;
@@ -31,5 +38,6 @@ const getTime = date => {
 module.exports = {
   createMessage,
   createUser,
-  createChat
+  createChat,
+  createChatNameFromUsers
 };

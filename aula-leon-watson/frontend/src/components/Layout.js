@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
-import { USER_CONNECTED, LOGOUT } from "../Events";
-import LoginForm from "./LoginForm";
-import ChatContainer from "./chats/ChatContainer";
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+import { USER_CONNECTED, LOGOUT, VERIFY_USER } from '../Events';
+import LoginForm from './LoginForm';
+import ChatContainer from './chats/ChatContainer';
 
-const socketUrl = "http://localhost:3333";
+const socketUrl = 'http://localhost:3333';
 export default function Layout({ title }) {
   const [socket, setSocket] = useState();
   const [user, setUser] = useState();
@@ -15,11 +15,24 @@ export default function Layout({ title }) {
 
   const initSocket = () => {
     const sio = io(socketUrl);
-    sio.on("connect", () => {
-      console.log("WS Conected!");
+    sio.on('connect', () => {
+      if (user) {
+        reconnect(sio);
+      } else {
+        console.log('WS Conected!');
+      }
     });
-
     setSocket(sio);
+  };
+
+  const reconnect = socket => {
+    socket.emit(VERIFY_USER, user.name, ({ isUser, user }) => {
+      if (isUser) {
+        setUser(null);
+      } else {
+        setUser(user);
+      }
+    });
   };
 
   const setConnectedUser = userConnected => {
@@ -31,13 +44,12 @@ export default function Layout({ title }) {
     socket.emit(LOGOUT);
     setUser(null);
   };
-  console.log(user);
   return (
     <div className="container">
       {socket && !user ? (
         <LoginForm socket={socket} setUser={setConnectedUser} />
       ) : (
-        <ChatContainer socket={socket} user={user} logout={logout} />
+        socket && <ChatContainer socket={socket} user={user} logout={logout} />
       )}
     </div>
   );
